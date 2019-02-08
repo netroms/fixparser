@@ -1,13 +1,10 @@
 #!/bin/bash                                                                     
 
-# Appends input to output N number of times
-
-# Aprox. 314MB
-N=200000
+# Appends input to output 200000 number of times
 
 IN="${1}"
 OUT="${2}"
 
-for i in {1..$N}; do
+for i in {1..200000}; do
     echo "${IN}"
 done | xargs cat > "${OUT}"
