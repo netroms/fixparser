@@ -21,6 +21,7 @@ class Message {
   private static final String SOH_DELIMITER = "\\u0001";
   private static final Pattern VALID_KEY = Pattern.compile("-?\\d+?");
   private static final FieldType GROUP_START_TAG = FieldType.BUYORSELL;
+  private static final boolean LOG_ERROR = false;
 
   private final ArrayList<FieldGroup> groups = new ArrayList<>();
   private final TreeMap<Integer, Field> fieldMap = new TreeMap<>();
@@ -134,13 +135,14 @@ class Message {
       String[] kv = p.split("=");
       if (kv.length == 2) {
         String k = kv[0];
+        String v = kv[1];
 
         if (!validateSyntax || isValidKey(k)) {
           FieldType fieldType = FieldType.fromString(k);
 
           // only process known/defined tags
           if (FieldType.UNKNOWN != fieldType) {
-            Field knownFieldType = new Field(fieldType, kv[1]);
+            Field knownFieldType = new Field(fieldType, v);
 
             // Assumption, if it is a group field start, process whole sequence
             // (since spec says it always comes in the same sequence)
@@ -154,16 +156,20 @@ class Message {
 
         } else {
           m.syntaxOk = false;
-          logger.error(String.format("Failed to parse key to int; "
-              + "key=%s, fullMessage=%s", k, fullMessage));
+          if (LOG_ERROR) {
+            logger.error(String.format("Failed to parse key to int; "
+                + "key=%s, fullMessage=%s", k, fullMessage));
+          }
         }
 
       } else {
         if (validateChecksum) {
           m.syntaxOk = false;
-          logger.error(String.format("Failed to parse key/value pair, "
-                  + "split on '=' failed; p=%s, kv.length=%s, fullMessage=%s",
-              p, kv.length, fullMessage));
+          if (LOG_ERROR) {
+            logger.error(String.format("Failed to parse key/value pair, "
+                    + "split on '=' failed; p=%s, kv.length=%s, fullMessage=%s",
+                p, kv.length, fullMessage));
+          }
         }
       }
     }
@@ -174,8 +180,10 @@ class Message {
       if (calculatedChecksum == checksumInMessage) {
         m.checksumOk = true;
       } else {
-        logger.error(String.format("Checksum failure; calculated=%s, message=%s, fullMessage=%s",
-            calculatedChecksum, checksumInMessage, fullMessage));
+        if (LOG_ERROR) {
+          logger.error(String.format("Checksum failure; calculated=%s, message=%s, fullMessage=%s",
+              calculatedChecksum, checksumInMessage, fullMessage));
+        }
       }
     }
 
