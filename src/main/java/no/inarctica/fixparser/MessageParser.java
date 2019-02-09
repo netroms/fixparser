@@ -59,7 +59,8 @@ class MessageParser {
             case BUYORSELL_TAG:
               final String pricePair = i.next();
               final String amountPair = i.next();
-              groups[groupCounter++] = (v.equals("0") ? " B " : " S ") + pricePair.split(KV_DELIM)[1] + ";" + amountPair.split(KV_DELIM)[1];
+              groups[groupCounter++] = (v.equals("0") ? " B " : " S ")
+                  + pricePair.split(KV_DELIM)[1] + ";" + amountPair.split(KV_DELIM)[1];
               break;
             case TIMESTAMP_TAG:
               timestamp = v;
@@ -78,8 +79,7 @@ class MessageParser {
     int end = data.lastIndexOf(CHECKSUM_CHARSEQ);
     int len = end > -1 ? end + 1 : data.length();
     for (int i = 0; i < len; i++) {
-      final int sum1 = data.charAt(i);
-      sum += sum1;
+      sum += data.charAt(i);
     }
     return sum & 0xFF;
   }
