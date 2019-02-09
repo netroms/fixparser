@@ -163,7 +163,7 @@ class Message {
         }
 
       } else {
-        if (validateChecksum) {
+        if (validateSyntax) {
           m.syntaxOk = false;
           if (LOG_ERROR) {
             logger.error(String.format("Failed to parse key/value pair, "
