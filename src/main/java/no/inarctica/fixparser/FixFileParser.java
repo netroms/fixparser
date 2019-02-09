@@ -117,11 +117,12 @@ public class FixFileParser {
     // set delimiter regexp!
     scanner.useDelimiter(MSG_START + "\\.");
 
+    int read = 0;
     while (scanner.hasNext()) {
 
       // Get message
       final String fullMessage = MSG_START + DOT + scanner.next();
-      result.read.incrementAndGet();
+      read++;
 
       if (ASYNC_PARSE == 0) {
         // Use no async parsing, parse message synchronously on main thread.
@@ -160,6 +161,8 @@ public class FixFileParser {
       tpe.shutdown();
     }
 
+    result.read.set(read);
+    result.parsed.set(result.read.get() - result.fail.get());
     result.setTotalElapsedTime(totalElapsedTime);
 
     return result;
@@ -182,13 +185,12 @@ public class FixFileParser {
   }
 
   private void handleMessage(ResultWrapper result, String fullMessage) {
-    final Message message = Message.parse(fullMessage, true, false);
-    if (!message.isValid()) {
+    final String message = MessageParser.parse(fullMessage);
+    if (message==null) {
       result.fail.incrementAndGet();
     } else {
-      result.parsed.incrementAndGet();
       if (LOGGING_ENABLED) {
-        log.info(message.getOutput());
+        log.info(message);
       }
     }
   }

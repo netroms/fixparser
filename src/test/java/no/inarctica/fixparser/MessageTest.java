@@ -1,7 +1,7 @@
 package no.inarctica.fixparser;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 
@@ -13,11 +13,9 @@ public class MessageTest {
         + "56=user\u0001262=TEST\u000155=EURUSD\u0001268=2\u0001269=0\u0001270=1.31678\u0001271=100000.0\u0001269=1\u0001"
         + "270=1.31667\u0001271=100000.0\u000110=057\u0001";
 
-    Message m = Message.parse(validMessage, true, false);
-    assertTrue("Message should be valid", m.isValid());
-    assertTrue("Message should have valid checksum", m.isChecksumOk());
+    String m = MessageParser.parse(validMessage);
+    assertNotNull("Message should be valid i.e not null", m);
   }
-
 
   @Test
   public void testParseMessageWithWrongChecksum() {
@@ -25,8 +23,7 @@ public class MessageTest {
         + "56=user\u0001262=TEST\u000155=EURUSD\u0001268=2\u0001269=0\u0001270=1.31678\u0001271=100000.0\u0001269=1\u0001"
         + "270=1.31667\u0001271=100000.0\u000110=057\u0001";
 
-    Message m = Message.parse(validMessage, true, false);
-    assertFalse("Message should not be valid", m.isValid());
-    assertFalse("Message should have invalid checksum", m.isChecksumOk());
+    String m = MessageParser.parse(validMessage);
+    assertNull("Message should not be valid, i.e null", m);
   }
 }
